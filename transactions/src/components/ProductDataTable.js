@@ -6,6 +6,7 @@ import ProductService from "../services/Product.service";
 const ProductDataTable = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("March");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,20 +14,13 @@ const ProductDataTable = () => {
   }, []);
 
   const setProductData = () => {
-    ProductService.getAllProduct().then((response) => {
+    ProductService.getAllProductTransactions(selectedMonth).then((response) => {
       setProducts(response.data);
     });
   };
 
-  const removeProduct = (id) => {
-    ProductService.deleteProduct(id)
-      .then((response) => {
-        setProductData();
-        navigate("/productdata");
-      })
-      .catch((error) => {
-        alert("Error Ocurred in removeEmployee:" + error);
-      });
+  const handleMonthChange = (event) => {
+    setSelectedMonth(event.target.value);
   };
 
   const handleSort = (column) => {
@@ -62,14 +56,36 @@ const ProductDataTable = () => {
 
   return (
     <div>
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+      <link
+        rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      ></link>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-      <div className="conatiner-fluid bg-secondary">
+      <div className="conatiner-fluid">
         <div className="row vh-100">
           <div className="col-md-12">
             <h1 className="mb-2">Product Transactions</h1>
-
+            <select value={selectedMonth} onChange={handleMonthChange}>
+              {[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ].map((month) => (
+                <option key={month} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
             <input
               className="mb-4"
               type="text"
@@ -79,10 +95,9 @@ const ProductDataTable = () => {
             />
 
             <h4 className="text-white">Show All Products</h4>
-              <div className="container">
+            <div className="container">
               <div className="row">
                 <div className="col-12">
-                  
                   <table className="table table-bordered table-striped table-dark">
                     <thead>
                       <tr>
@@ -97,7 +112,14 @@ const ProductDataTable = () => {
                           onClick={() => stringSortasc("name")}
                           onDoubleClick={() => stringSortdesc("name")}
                         >
-                          Name
+                          Title
+                          <span class="glyphicon glyphicon-filter"></span>
+                        </th>
+                        <th
+                          onClick={() => stringSortasc("description")}
+                          onDoubleClick={() => stringSortdesc("description")}
+                        >
+                          Description
                           <span class="glyphicon glyphicon-filter"></span>
                         </th>
                         <th
@@ -114,8 +136,12 @@ const ProductDataTable = () => {
                           Price
                           <span class="glyphicon glyphicon-filter"></span>
                         </th>
-                        <th>Delete</th>
-                       
+                        <th
+                        onClick={() => handleSort("dateofsale")}
+                        onDoubleClick={() => handleSort2("dateofsale")}>
+                          Date Of Sale
+                          <span class="glyphicon glyphicon-filter"></span>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -127,29 +153,16 @@ const ProductDataTable = () => {
                           <td>{product.category}</td>
                           <td>{product.price}</td>
                           <td>{product.dateOfSale}</td>
-                          <td>
-                            {" "}
-                            <button
-                              onClick={() => {
-                                removeProduct(product.id);
-                              }}
-                              className="btn btn-primary"
-                            >
-                              DELETE
-                            </button>
-                          </td>
-                          
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
-      
+      </div>
     </div>
   );
 };
